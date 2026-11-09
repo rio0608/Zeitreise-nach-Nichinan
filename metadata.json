@@ -1,0 +1,11 @@
+{
+  "name": "日南観光ナビ",
+  "description": "日南の青い海・太陽・歴史ある城下町と満天の星・ライトアップを昼夜で楽しめる観光スポットガイド＆体験事前予約Webアプリ",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
