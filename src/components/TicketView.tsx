@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Reservation } from '../types';
 import { DigitalTicketCard } from './DigitalTicketCard';
 import { storageService } from '../services/storageService';
-import { ChevronLeft, Ticket, AlertCircle, X, Sparkles, PlusCircle } from 'lucide-react';
+import { ChevronLeft, Ticket, X, PlusCircle, Trash2, AlertTriangle } from 'lucide-react';
 import QRCode from 'qrcode';
 
 interface TicketViewProps {
@@ -23,6 +23,7 @@ export const TicketView: React.FC<TicketViewProps> = ({
   );
   const [fullscreenQr, setFullscreenQr] = useState<Reservation | null>(null);
   const [fullscreenQrImg, setFullscreenQrImg] = useState<string>('');
+  const [confirmDeleteTarget, setConfirmDeleteTarget] = useState<Reservation | null>(null);
 
   const activeRes = reservations.find((r) => r.id === activeReservationId) || reservations[0];
 
@@ -42,8 +43,16 @@ export const TicketView: React.FC<TicketViewProps> = ({
     ).then((url) => setFullscreenQrImg(url));
   };
 
-  const handleMarkUsed = (id: string) => {
-    storageService.updateReservationStatus(id, 'used');
+  const handleConfirmDelete = () => {
+    if (!confirmDeleteTarget) return;
+    const deletedId = confirmDeleteTarget.id;
+    storageService.deleteReservation(deletedId);
+    if (fullscreenQr?.id === deletedId) {
+      setFullscreenQr(null);
+    }
+    const remaining = reservations.filter((r) => r.id !== deletedId);
+    setActiveReservationId(remaining[0]?.id || '');
+    setConfirmDeleteTarget(null);
     onRefresh();
   };
 
@@ -120,6 +129,7 @@ export const TicketView: React.FC<TicketViewProps> = ({
             <DigitalTicketCard
               reservation={activeRes}
               onOpenFullscreen={() => handleOpenFullscreen(activeRes)}
+              onDelete={() => setConfirmDeleteTarget(activeRes)}
             />
           )}
         </>
@@ -168,6 +178,56 @@ export const TicketView: React.FC<TicketViewProps> = ({
             >
               閉じる
             </button>
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal */}
+      {confirmDeleteTarget && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-base font-extrabold text-slate-900">
+                  チケットを削除しますか？
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  選択を間違えたチケットなどをマイチケットから削除できます。削除後は元に戻せません。
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+              <div className="font-bold text-slate-900">{confirmDeleteTarget.spotName}</div>
+              <div className="text-slate-600">
+                {confirmDeleteTarget.date} / {confirmDeleteTarget.timeRange}
+              </div>
+              <div className="text-[11px] font-mono text-slate-500">
+                チケット番号: {confirmDeleteTarget.ticketNumber}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                id="btn-cancel-delete-ticket"
+                type="button"
+                onClick={() => setConfirmDeleteTarget(null)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+              >
+                キャンセル
+              </button>
+              <button
+                id="btn-confirm-delete-ticket"
+                type="button"
+                onClick={handleConfirmDelete}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>削除する</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

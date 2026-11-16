@@ -26,12 +26,14 @@ interface SpotWeatherWidgetProps {
   spotId: string;
   currentLanguage?: Language;
   defaultExpanded?: boolean;
+  compact?: boolean;
 }
 
 export const SpotWeatherWidget: React.FC<SpotWeatherWidgetProps> = ({
   spotId,
   currentLanguage = 'ja',
   defaultExpanded = false,
+  compact = false,
 }) => {
   const [weather, setWeather] = useState<SpotWeatherData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -99,7 +101,12 @@ export const SpotWeatherWidget: React.FC<SpotWeatherWidgetProps> = ({
   };
 
   if (isLoading) {
-    return (
+    return compact ? (
+      <div className="flex items-center gap-1.5 text-xs text-slate-400 py-0.5">
+        <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+        <span>{t.weatherTitle}...</span>
+      </div>
+    ) : (
       <div className="p-3 rounded-xl bg-slate-50/90 border border-slate-200/80 flex items-center justify-between text-xs text-slate-500 animate-pulse">
         <div className="flex items-center gap-2">
           <Sun className="w-4 h-4 text-amber-400 animate-spin" />
@@ -120,6 +127,23 @@ export const SpotWeatherWidget: React.FC<SpotWeatherWidgetProps> = ({
       : pop >= 25
       ? 'bg-amber-50 text-amber-800 border-amber-300 font-bold'
       : 'bg-emerald-50 text-emerald-800 border-emerald-200 font-semibold';
+
+  if (compact) {
+    return (
+      <div className="flex items-center justify-between gap-2 text-xs text-slate-700 py-0.5 tabular-nums">
+        <div className="flex items-center gap-1.5 min-w-0">
+          {renderWeatherIcon(weather.weatherCategory, 'w-4 h-4 shrink-0')}
+          <span className="font-bold text-slate-900">{weather.temperature}°C</span>
+          <span className="text-slate-600 truncate">{weather.weatherText}</span>
+        </div>
+        <div className="flex items-center gap-1 text-slate-600 shrink-0">
+          <Umbrella className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+          <span>{t.weatherPop}</span>
+          <span className="font-bold text-slate-900">{pop}%</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl border border-sky-100 bg-gradient-to-br from-sky-50/60 via-white to-amber-50/40 p-3 text-xs shadow-xs transition-all">

@@ -425,18 +425,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </section>
 
       {/* 2.5 Model Course Auto-Suggestion Banner */}
-      <section className="bg-gradient-to-r from-teal-700 via-sky-700 to-indigo-800 rounded-3xl p-5 sm:p-6 text-white shadow-md relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+      <section className="bg-gradient-to-r from-amber-300 via-yellow-200 to-orange-200 border border-amber-300/80 rounded-3xl p-5 sm:p-6 text-slate-900 shadow-md relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/35 rounded-full blur-2xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-xs text-amber-300 text-[11px] font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/85 backdrop-blur-xs text-amber-900 border border-amber-300 text-[11px] font-bold">
+              <Sparkles className="w-3.5 h-3.5 text-orange-500" />
               <span>{t.courseBadge}</span>
             </div>
-            <h3 className="text-base sm:text-lg font-black tracking-tight leading-snug">
+            <h3 className="text-base sm:text-lg font-black tracking-tight leading-snug text-slate-950">
               {t.courseTitle}
             </h3>
-            <p className="text-xs text-sky-100 leading-relaxed font-medium">
+            <p className="text-xs text-slate-800 leading-relaxed font-medium">
               {t.courseDesc}
             </p>
           </div>
@@ -444,9 +444,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <button
             id="btn-home-open-course"
             onClick={onOpenCourse}
-            className="shrink-0 px-4 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer hover:scale-105 active:scale-95"
+            className="shrink-0 px-4 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer hover:scale-105 active:scale-95"
           >
-            <Compass className="w-4 h-4 text-slate-950" />
+            <Compass className="w-4 h-4 text-amber-300" />
             <span>{t.courseCreateBtn}</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
@@ -678,23 +678,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {/* Real-time Congestion & Location Live Console */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-indigo-950 text-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-700/60 space-y-3.5">
+        <div className="bg-gradient-to-br from-amber-200/90 via-yellow-100 to-orange-100 text-slate-900 p-4 sm:p-5 rounded-2xl shadow-sm border border-amber-300/90 space-y-3.5">
           {/* Header Row: Title & Congestion Refresh Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="p-1.5 rounded-lg bg-white/85 text-orange-600 border border-amber-300 shadow-2xs">
                 <Activity className="w-4 h-4 animate-pulse" />
               </span>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-extrabold text-white tracking-tight">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-sm font-extrabold text-slate-950 tracking-tight">
                     {t.consoleTitle}
                   </h3>
-                  <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md font-mono border border-slate-700">
+                  <span className="text-[10px] bg-white/85 text-amber-950 px-2 py-0.5 rounded-md font-mono border border-amber-300">
                     {lastRefreshedAt} {t.infoUpdate}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-slate-700 font-medium">
                   {t.consoleDesc}
                 </p>
               </div>
@@ -705,18 +705,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
               type="button"
               onClick={handleRefreshCongestion}
               disabled={isRefreshingCongestion}
-              className="shrink-0 self-start sm:self-auto px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer hover:text-white"
+              className="shrink-0 self-start sm:self-auto px-3 py-1.5 rounded-xl bg-white hover:bg-amber-50 text-slate-900 text-xs font-bold border border-amber-300 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
               title={t.refreshBtn}
             >
-              <RotateCw className={`w-3.5 h-3.5 text-sky-400 ${isRefreshingCongestion ? 'animate-spin' : ''}`} />
+              <RotateCw className={`w-3.5 h-3.5 text-orange-600 ${isRefreshingCongestion ? 'animate-spin' : ''}`} />
               <span>{isRefreshingCongestion ? t.refreshing : t.refreshBtn}</span>
             </button>
           </div>
 
           {/* Row 1: Congestion Level Quick Filter Chips */}
           <div className="pt-1 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400 font-semibold flex items-center gap-1 shrink-0">
-              <Filter className="w-3.5 h-3.5" />
+            <span className="text-xs text-slate-700 font-semibold flex items-center gap-1 shrink-0">
+              <Filter className="w-3.5 h-3.5 text-orange-600" />
               <span>{t.filterLabel}</span>
             </span>
 
@@ -725,8 +725,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setCongestionFilter('all')}
               className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 congestionFilter === 'all'
-                  ? 'bg-white text-slate-950 shadow-sm'
-                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700'
+                  ? 'bg-slate-900 text-amber-300 shadow-sm'
+                  : 'bg-white/85 text-slate-700 hover:bg-white border border-amber-300'
               }`}
             >
               {t.filterAll} ({spots.length})
@@ -737,11 +737,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setCongestionFilter(congestionFilter === 'smooth' ? 'all' : 'smooth')}
               className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 congestionFilter === 'smooth'
-                  ? 'bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-300'
-                  : 'bg-emerald-950/60 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-700/60'
+                  ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-300'
+                  : 'bg-white/90 text-emerald-800 hover:bg-emerald-50 border border-emerald-300'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>{t.filterSmooth} ({congestionCounts.smooth})</span>
             </button>
 
@@ -751,10 +751,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 congestionFilter === 'moderate'
                   ? 'bg-amber-500 text-slate-950 shadow-sm ring-2 ring-amber-300'
-                  : 'bg-amber-950/60 text-amber-300 hover:bg-amber-900/60 border border-amber-700/60'
+                  : 'bg-white/90 text-amber-900 hover:bg-amber-50 border border-amber-400'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
               <span>{t.filterModerate} ({congestionCounts.moderate})</span>
             </button>
 
@@ -763,26 +763,26 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setCongestionFilter(congestionFilter === 'busy' ? 'all' : 'busy')}
               className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 congestionFilter === 'busy'
-                  ? 'bg-rose-500 text-white shadow-sm ring-2 ring-rose-300'
-                  : 'bg-rose-950/60 text-rose-300 hover:bg-rose-900/60 border border-rose-700/60'
+                  ? 'bg-rose-600 text-white shadow-sm ring-2 ring-rose-300'
+                  : 'bg-white/90 text-rose-800 hover:bg-rose-50 border border-rose-300'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-rose-400" />
+              <span className="w-2 h-2 rounded-full bg-rose-500" />
               <span>{t.filterBusy} ({congestionCounts.busy})</span>
             </button>
           </div>
 
           {/* Row 2: Location Status & Preset Departure Selector */}
-          <div className="pt-2 border-t border-slate-800/80">
+          <div className="pt-2.5 border-t border-amber-300/70">
             {userLocation ? (
-              <div className="bg-sky-950/60 border border-sky-600/40 rounded-xl p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div className="bg-white/90 border border-amber-300 rounded-xl p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-2xs">
                 <div className="flex items-center gap-2">
-                  <Navigation className="w-4 h-4 text-sky-400 shrink-0" />
+                  <Navigation className="w-4 h-4 text-orange-600 shrink-0" />
                   <div>
-                    <span className="font-bold text-sky-200">
+                    <span className="font-bold text-slate-900">
                       {t.locationActive} {userLocation.label || 'GPS'}
                     </span>
-                    <span className="text-[11px] text-sky-300/80 block sm:inline sm:ml-2">
+                    <span className="text-[11px] text-slate-600 block sm:inline sm:ml-2">
                       {t.locationCalculating}
                     </span>
                   </div>
@@ -793,14 +793,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     type="button"
                     onClick={handleRequestLocation}
                     disabled={isLocating}
-                    className="px-2.5 py-1 rounded-lg bg-sky-900/80 hover:bg-sky-800 text-sky-200 font-bold border border-sky-600/50 transition-colors cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold border border-amber-500/40 transition-colors cursor-pointer"
                   >
                     {isLocating ? t.locationLocating : t.locationReacquire}
                   </button>
                   <button
                     type="button"
                     onClick={handleClearLocation}
-                    className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    className="p-1 rounded-lg hover:bg-amber-100 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                     title="Clear location"
                   >
                     <X className="w-4 h-4" />
@@ -814,7 +814,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   type="button"
                   onClick={handleRequestLocation}
                   disabled={isLocating}
-                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white font-extrabold text-xs shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 hover:from-amber-500 hover:via-yellow-500 hover:to-orange-500 text-slate-950 font-extrabold text-xs shadow-sm hover:shadow border border-amber-500/40 transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
                 >
                   <Locate className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
                   <span>{isLocating ? t.locationLocating : t.locationGetBtn}</span>
@@ -822,13 +822,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                 {/* Preset Options for quick test */}
                 <div className="flex items-center gap-1.5 flex-wrap text-xs">
-                  <span className="text-slate-400 text-[11px] shrink-0">{t.presetLabel}</span>
+                  <span className="text-slate-700 font-medium text-[11px] shrink-0">{t.presetLabel}</span>
                   {PRESET_LOCATIONS.map((preset) => (
                     <button
                       key={preset.id}
                       type="button"
                       onClick={() => handleSelectPresetLocation(preset)}
-                      className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-[11px] font-medium transition-colors cursor-pointer"
+                      className="px-2 py-0.5 rounded-lg bg-white/90 hover:bg-amber-100 text-slate-800 hover:text-slate-950 border border-amber-300 text-[11px] font-semibold transition-colors cursor-pointer"
                     >
                       {preset.name}
                     </button>
@@ -842,8 +842,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div
                 className={`mt-2 p-2 rounded-lg text-xs flex items-center justify-between gap-2 ${
                   locationNotice.type === 'error'
-                    ? 'bg-rose-950/80 text-rose-200 border border-rose-800'
-                    : 'bg-emerald-950/80 text-emerald-200 border border-emerald-800'
+                    ? 'bg-rose-50 text-rose-900 border border-rose-300'
+                    : 'bg-emerald-50 text-emerald-900 border border-emerald-300'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
@@ -853,7 +853,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setLocationNotice(null)}
-                  className="text-white/60 hover:text-white"
+                  className="text-slate-500 hover:text-slate-900"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -862,10 +862,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           {/* Row: Google Maps Real-Time Highway Traffic & Coastal Arteries */}
-          <div className="pt-2 border-t border-slate-800/80 space-y-2">
+          <div className="pt-2.5 border-t border-amber-300/70 space-y-2">
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                <Car className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <Car className="w-4 h-4 text-orange-600" />
                 <span>Googleマップ連携 主要幹線・道路リアルタイム交通状況</span>
               </span>
 
@@ -878,7 +878,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-300 hover:text-white bg-sky-900/60 hover:bg-sky-800/80 px-2.5 py-1 rounded-lg border border-sky-600/50 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-950 hover:text-slate-900 bg-amber-300 hover:bg-amber-400 px-2.5 py-1 rounded-lg border border-amber-500/50 shadow-2xs transition-colors"
                 title="Googleマップで日南全域の渋滞・混雑レイヤーを全画面で開く"
               >
                 <span>Googleマップ交通状況を開く</span>
@@ -890,41 +890,41 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {getNichinanTrafficOverview(congestionRefreshVersion).map((highway, idx) => (
                 <div
                   key={idx}
-                  className="p-2 rounded-xl bg-slate-950/70 border border-slate-800/90 flex flex-col justify-between text-xs space-y-1"
+                  className="p-2.5 rounded-xl bg-white/90 border border-amber-200 flex flex-col justify-between text-xs space-y-1 shadow-2xs"
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="font-extrabold text-slate-200 truncate">{highway.name}</span>
+                    <span className="font-extrabold text-slate-900 truncate">{highway.name}</span>
                     <span
                       className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
                         highway.status === 'congested'
-                          ? 'bg-rose-900/80 text-rose-300'
+                          ? 'bg-rose-100 text-rose-800'
                           : highway.status === 'moderate'
-                          ? 'bg-amber-900/80 text-amber-300'
-                          : 'bg-emerald-900/80 text-emerald-300'
+                          ? 'bg-amber-100 text-amber-900'
+                          : 'bg-emerald-100 text-emerald-800'
                       }`}
                     >
                       {highway.speedKmH}km/h
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-snug">{highway.statusText}</p>
+                  <p className="text-[11px] text-slate-600 leading-snug">{highway.statusText}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Row 3: Sort Selector Bar */}
-          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-1.5">
-              <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-slate-400 text-[11px] font-semibold">{t.sortLabel}</span>
-              <div className="inline-flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
+          <div className="pt-2.5 border-t border-amber-300/70 flex items-center justify-between gap-2 flex-wrap text-xs">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <ArrowUpDown className="w-3.5 h-3.5 text-orange-600" />
+              <span className="text-slate-700 text-[11px] font-semibold">{t.sortLabel}</span>
+              <div className="inline-flex rounded-lg bg-white/90 p-0.5 border border-amber-300">
                 <button
                   type="button"
                   onClick={() => setSortBy('default')}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                     sortBy === 'default'
-                      ? 'bg-sky-500 text-white'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-400 text-slate-950 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {t.sortDefault}
@@ -940,8 +940,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   }}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                     sortBy === 'nearest'
-                      ? 'bg-sky-500 text-white'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-400 text-slate-950 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                   title={userLocation ? t.sortNearest : t.sortNearestNeedsGps}
                 >
@@ -952,8 +952,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onClick={() => setSortBy('least_crowded')}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                     sortBy === 'least_crowded'
-                      ? 'bg-sky-500 text-white'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-400 text-slate-950 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {t.sortLeastCrowded}
@@ -962,8 +962,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             {/* Active filtered count */}
-            <span className="text-[11px] text-slate-400">
-              {t.displayCount} <strong className="text-white font-bold">{filteredSpots.length}</strong> / {spots.length} {t.itemsCount}
+            <span className="text-[11px] text-slate-700 font-medium">
+              {t.displayCount} <strong className="text-slate-950 font-extrabold">{filteredSpots.length}</strong> / {spots.length} {t.itemsCount}
             </span>
           </div>
         </div>

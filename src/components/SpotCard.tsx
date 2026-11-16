@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NichinanSpot, TimeTheme, LiveCongestionInfo } from '../types';
 import { calculateLiveCongestion, getSpotDistanceInfo } from '../services/congestionService';
 import { Language, UI_TRANSLATIONS, getLocalizedSpot } from '../i18n/translations';
@@ -12,11 +12,11 @@ import {
   Sun,
   Moon,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Navigation,
-  Car,
-  Footprints,
-  Users,
   Heart,
+  Users,
 } from 'lucide-react';
 
 interface SpotCardProps {
@@ -42,6 +42,8 @@ export const SpotCard: React.FC<SpotCardProps> = ({
   isFavorite = false,
   onToggleFavorite,
 }) => {
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState<boolean>(false);
+
   const t = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.ja;
   const localizedSpot = getLocalizedSpot(spot, currentLanguage);
 
@@ -57,6 +59,11 @@ export const SpotCard: React.FC<SpotCardProps> = ({
   // Compute distance from user location
   const distanceInfo = userLocation ? getSpotDistanceInfo(spot.id, userLocation) : null;
 
+  // Google Maps Directions URL from current location
+  const directionsFromCurrentLocationUrl = userLocation
+    ? `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${encodeURIComponent(spot.googleMapQuery)}&travelmode=driving`
+    : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(spot.googleMapQuery)}&travelmode=driving`;
+
   // Localized congestion status text
   const localizedStatusText =
     congestion.level === 'smooth'
@@ -65,64 +72,28 @@ export const SpotCard: React.FC<SpotCardProps> = ({
       ? t.statusModerate
       : t.statusBusy;
 
-  // Congestion Badge Component
-  const renderCongestionBadge = (isOverlay = false) => {
-    switch (congestion.level) {
-      case 'smooth':
-        return (
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold shadow-xs ${
-              isOverlay
-                ? 'bg-emerald-600/90 text-white backdrop-blur-xs border border-emerald-400/40'
-                : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-            }`}
-            title={localizedStatusText}
-          >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>{t.statusSmooth}</span>
-          </span>
-        );
-      case 'moderate':
-        return (
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold shadow-xs ${
-              isOverlay
-                ? 'bg-amber-600/90 text-white backdrop-blur-xs border border-amber-400/40'
-                : 'bg-amber-50 text-amber-800 border border-amber-300'
-            }`}
-            title={localizedStatusText}
-          >
-            <span className="w-2 h-2 rounded-full bg-amber-300 animate-pulse" />
-            <span>{t.statusModerate}</span>
-          </span>
-        );
-      case 'busy':
-        return (
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold shadow-xs ${
-              isOverlay
-                ? 'bg-rose-600/90 text-white backdrop-blur-xs border border-rose-400/40'
-                : 'bg-rose-50 text-rose-800 border border-rose-300'
-            }`}
-            title={localizedStatusText}
-          >
-            <span className="w-2 h-2 rounded-full bg-rose-300 animate-ping" />
-            <span>{t.statusBusy}</span>
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
+  const congestionStatusColor =
+    congestion.level === 'smooth'
+      ? 'text-emerald-700'
+      : congestion.level === 'moderate'
+      ? 'text-amber-700'
+      : 'text-rose-700';
+
+  const congestionOverlayClass =
+    congestion.level === 'smooth'
+      ? 'bg-emerald-600/90 text-white border-emerald-400/40'
+      : congestion.level === 'moderate'
+      ? 'bg-amber-600/90 text-white border-amber-400/40'
+      : 'bg-rose-600/90 text-white border-rose-400/40';
 
   return (
     <div
       id={`spot-card-${spot.id}`}
-      className="group relative flex flex-col justify-between bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-sky-300 transition-all overflow-hidden"
+      className="group relative flex flex-col justify-between bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-sky-300 transition-all overflow-hidden"
     >
-      {/* Spot Real Photograph Banner if available */}
+      {/* Spot Photograph Banner */}
       {spot.imageUrl && (
-        <div className="relative h-44 sm:h-52 w-full overflow-hidden bg-slate-900">
+        <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-900">
           <img
             src={spot.imageUrl}
             alt={localizedSpot.name}
@@ -132,19 +103,23 @@ export const SpotCard: React.FC<SpotCardProps> = ({
               (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
             }}
           />
-          {/* Contrast Scrim */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-black/35 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-black/35 pointer-events-none" />
 
           {/* Top Left: Category */}
           <div className="absolute top-3 left-3">
-            <span className="text-[11px] font-bold text-white bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md border border-white/20">
+            <span className="text-[11px] font-bold text-white bg-black/55 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-white/15">
               {localizedSpot.categoryLabel}
             </span>
           </div>
 
-          {/* Top Right: Live Congestion Badge & Favorite Heart Button */}
+          {/* Top Right: Live Congestion + Favorite Heart */}
           <div className="absolute top-3 right-3 flex items-center gap-2">
-            {renderCongestionBadge(true)}
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold backdrop-blur-xs border shadow-xs ${congestionOverlayClass}`}
+            >
+              <span>{localizedStatusText}</span>
+            </span>
+
             {onToggleFavorite && (
               <button
                 id={`btn-favorite-${spot.id}`}
@@ -171,19 +146,21 @@ export const SpotCard: React.FC<SpotCardProps> = ({
             )}
           </div>
 
-          {/* Bottom Overlay: Area & Distance info */}
-          <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
-            <span className="font-semibold flex items-center gap-1 drop-shadow-md">
-              <MapPin className="w-3.5 h-3.5 text-sky-400" />
-              {localizedSpot.area}
+          {/* Bottom Overlay: Area & Distance */}
+          <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between gap-2 text-white text-xs">
+            <span className="font-semibold flex items-center gap-1 drop-shadow-md truncate">
+              <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              <span className="truncate">{localizedSpot.area}</span>
             </span>
 
-            {/* Distance from user */}
             {distanceInfo ? (
-              <span className="text-[11px] font-bold bg-sky-950/80 border border-sky-400/40 text-sky-200 px-2 py-0.5 rounded-md backdrop-blur-xs flex items-center gap-1">
+              <span className="text-[11px] font-bold bg-sky-950/85 border border-sky-400/40 text-sky-100 px-2 py-0.5 rounded-md backdrop-blur-xs flex items-center gap-1 shrink-0 tabular-nums">
                 <Navigation className="w-3 h-3 text-sky-300" />
-                <span>{t.distFromLocation}{distanceInfo.distanceKm}km</span>
-                <span className="text-white/80">{t.distCar}{distanceInfo.carMinutes}{t.distMin}</span>
+                <span>{distanceInfo.distanceKm}km</span>
+                <span className="text-white/80">
+                  ({distanceInfo.carMinutes}
+                  {t.distMin})
+                </span>
               </span>
             ) : onRequestLocation ? (
               <button
@@ -192,7 +169,7 @@ export const SpotCard: React.FC<SpotCardProps> = ({
                   e.stopPropagation();
                   onRequestLocation();
                 }}
-                className="text-[10px] font-medium text-sky-200 hover:text-white bg-black/50 hover:bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-xs border border-white/20 transition-colors flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-semibold text-sky-100 hover:text-white bg-black/55 hover:bg-black/75 px-2.5 py-0.5 rounded-md backdrop-blur-xs border border-white/20 transition-colors flex items-center gap-1 cursor-pointer shrink-0"
                 title={t.measureDistBtn}
               >
                 <Navigation className="w-2.5 h-2.5 text-sky-300" />
@@ -203,238 +180,237 @@ export const SpotCard: React.FC<SpotCardProps> = ({
         </div>
       )}
 
-      <div>
-        {/* Card Header Top */}
-        <div className="p-5 pb-3">
+      {/* Main Card Content */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+        <div className="space-y-2.5">
+          {/* Header: Title & Quick Reservation / Favorite fallback */}
           <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                {spot.imageEmoji}
-              </span>
-              <div>
-                {!spot.imageUrl && (
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">
-                      {localizedSpot.categoryLabel}
-                    </span>
-                    <span className="text-xs text-slate-500 font-medium flex items-center gap-0.5">
-                      <MapPin className="w-3 h-3 text-slate-400" />
-                      {localizedSpot.area}
-                    </span>
-                  </div>
-                )}
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-sky-700 transition-colors">
-                  {localizedSpot.name}
-                </h3>
-              </div>
+            <div className="min-w-0">
+              {!spot.imageUrl && (
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
+                  <span className="font-bold text-sky-700">{localizedSpot.categoryLabel}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{localizedSpot.area}</span>
+                </div>
+              )}
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900 leading-snug group-hover:text-sky-700 transition-colors">
+                {spot.imageEmoji} {localizedSpot.name}
+              </h3>
             </div>
 
-            {/* Reservation Badge, Fallback Congestion & Fallback Favorite if no image */}
-            <div className="shrink-0 flex flex-col items-end gap-1.5">
-              <div className="flex items-center gap-1.5">
-                {!spot.imageUrl && onToggleFavorite && (
-                  <button
-                    id={`btn-favorite-fallback-${spot.id}`}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleFavorite(spot.id);
-                    }}
-                    aria-label={isFavorite ? t.removeFromFavorites : t.addToFavorites}
-                    aria-pressed={isFavorite}
-                    title={isFavorite ? t.removeFromFavorites : t.addToFavorites}
-                    className={`p-1.5 rounded-full border transition-all cursor-pointer active:scale-90 ${
-                      isFavorite
-                        ? 'bg-rose-50 border-rose-300 text-rose-500 hover:bg-rose-100'
-                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-200'
-                    }`}
-                  >
-                    <Heart
-                      className={`w-4 h-4 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`}
-                    />
-                  </button>
-                )}
-                {spot.requiresReservation ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold shadow-xs">
-                    <CalendarCheck className="w-3 h-3 text-amber-600" />
-                    {t.requiresBooking}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-                    {t.freeAdmission}
-                  </span>
-                )}
-              </div>
-              {!spot.imageUrl && renderCongestionBadge(false)}
-            </div>
+            {!spot.imageUrl && onToggleFavorite && (
+              <button
+                id={`btn-favorite-fallback-${spot.id}`}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite(spot.id);
+                }}
+                aria-label={isFavorite ? t.removeFromFavorites : t.addToFavorites}
+                aria-pressed={isFavorite}
+                className={`p-1.5 rounded-full border transition-all cursor-pointer shrink-0 ${
+                  isFavorite
+                    ? 'bg-rose-50 border-rose-300 text-rose-500'
+                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`} />
+              </button>
+            )}
           </div>
 
-          <p className="mt-2.5 text-xs text-slate-600 line-clamp-2 leading-relaxed">
+          {/* Unboxed Quiet Metadata Row (Hours + Reservation requirement) */}
+          <div className="flex items-center flex-wrap gap-x-2.5 gap-y-1 text-xs text-slate-600">
+            <span
+              className={`font-bold ${
+                spot.requiresReservation ? 'text-amber-700' : 'text-emerald-700'
+              }`}
+            >
+              {spot.requiresReservation ? t.requiresBooking : t.freeAdmission}
+            </span>
+            <span className="text-slate-300" aria-hidden="true">
+              ·
+            </span>
+            <span className="inline-flex items-center gap-1 text-slate-600">
+              <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <span className="truncate max-w-[230px]">{localizedSpot.hours}</span>
+            </span>
+          </div>
+
+          {/* Concise 2-Line Description */}
+          <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
             {localizedSpot.description}
           </p>
 
-          {/* Real-time Status Information Strip with Telemetry & Google Maps Link */}
-          <div className="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-slate-500 text-[11px] font-semibold">{t.liveStatusLabel}</span>
-                <span className="font-extrabold text-slate-900 text-xs">{localizedStatusText}</span>
-                {/* Dynamic Crowd Gauge */}
-                <span
-                  className={`px-2 py-0.5 rounded-md text-[11px] font-black tracking-tight ${
-                    congestion.level === 'busy'
-                      ? 'bg-rose-100 text-rose-800'
-                      : congestion.level === 'moderate'
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-emerald-100 text-emerald-800'
-                  }`}
-                >
-                  {congestion.crowdPercentage}% 混雑度
+          {/* Clean Compact Live Summary (Congestion + Weather in 2 uncluttered lines) */}
+          <div className="pt-2.5 pb-1 border-t border-slate-100 space-y-2">
+            {/* Congestion 1-Line Summary */}
+            <div className="flex items-center justify-between gap-2 text-xs tabular-nums">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className={`font-bold ${congestionStatusColor}`}>
+                  {localizedStatusText}
                 </span>
-                {congestion.waitingMinutesEstimate > 0 ? (
-                  <span className="text-[11px] text-amber-700 font-medium">
-                    （{t.waitEstimated}{congestion.waitingMinutesEstimate}{t.distMin}）
-                  </span>
-                ) : (
-                  <span className="text-[11px] text-emerald-700 font-medium">（{t.waitNone}）</span>
+                <span className="text-slate-500">({congestion.crowdPercentage}%)</span>
+              </div>
+              <span className="text-[11px] text-slate-500 shrink-0">
+                {congestion.waitingMinutesEstimate > 0
+                  ? `${t.waitEstimated}${congestion.waitingMinutesEstimate}${t.distMin}`
+                  : t.waitNone}
+              </span>
+            </div>
+
+            {/* Live Weather Summary (Compact when collapsed, Full when expanded) */}
+            <SpotWeatherWidget
+              spotId={spot.id}
+              currentLanguage={currentLanguage}
+              compact={!isDetailsExpanded}
+            />
+          </div>
+
+          {/* Expandable Detailed Info Section */}
+          {isDetailsExpanded && (
+            <div className="pt-2 border-t border-slate-100 space-y-3 text-xs">
+              {/* Parking & Google Maps Live Traffic Info */}
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="font-bold text-slate-700">🅿️ {congestion.parkingText}</span>
+                  <a
+                    href={congestion.googleMapsTrafficUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-700 hover:text-sky-900 font-bold inline-flex items-center gap-1 hover:underline"
+                  >
+                    <span>Googleマップ交通状況</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                {congestion.congestionReason && (
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    {congestion.congestionReason}
+                  </p>
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                <span className="font-semibold text-slate-500">
-                  {congestion.trend === 'increasing'
-                    ? '↗ 増加傾向'
-                    : congestion.trend === 'decreasing'
-                    ? '↘ 緩和傾向'
-                    : '→ 安定'}
-                </span>
-                <span>•</span>
-                <span>{t.updateTime} {congestion.lastUpdated}</span>
+              {/* Day & Night Highlights */}
+              <div className="space-y-2">
+                <div
+                  className={`p-2.5 rounded-xl border ${
+                    currentTheme === 'day'
+                      ? 'bg-sky-50/70 border-sky-200 text-slate-800'
+                      : 'bg-slate-50 border-slate-100 text-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-sky-800 mb-0.5">
+                    <Sun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span>{t.dayHighlightLabel}</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed pl-5">
+                    {localizedSpot.daytimeHighlight}
+                  </p>
+                </div>
+
+                <div
+                  className={`p-2.5 rounded-xl border ${
+                    currentTheme === 'night' || currentTheme === 'sunset'
+                      ? 'bg-indigo-50/70 border-indigo-200 text-slate-800'
+                      : 'bg-slate-50 border-slate-100 text-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-indigo-800 mb-0.5">
+                    <Moon className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>{t.nightHighlightLabel}</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed pl-5">
+                    {localizedSpot.nighttimeHighlight}
+                  </p>
+                </div>
+              </div>
+
+              {/* Night Hours & Clean Unboxed Tags */}
+              {localizedSpot.nightHours && (
+                <div className="text-indigo-700 font-medium flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                  <span>
+                    {t.nightHoursLabel} {localizedSpot.nightHours}
+                  </span>
+                </div>
+              )}
+
+              <div className="text-[11px] text-slate-500 leading-relaxed">
+                {localizedSpot.tags.map((tag: string, idx: number) => (
+                  <span key={idx}>
+                    #{tag}
+                    {idx < localizedSpot.tags.length - 1 ? ' · ' : ''}
+                  </span>
+                ))}
               </div>
             </div>
-
-            {/* Parking Telemetry & Quick Google Maps Live Traffic Link */}
-            <div className="pt-1.5 border-t border-slate-200/60 flex items-center justify-between gap-2 text-[11px] text-slate-600 flex-wrap">
-              <span className="font-bold text-slate-700">
-                🅿️ {congestion.parkingText}
-              </span>
-              <a
-                href={congestion.googleMapsTrafficUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sky-700 hover:text-sky-900 font-bold flex items-center gap-1 hover:underline"
-                title="Googleマップでこのスポットの最新道路状況とルートを確認"
-              >
-                <span>Googleマップ交通状況</span>
-                <ExternalLink className="w-3 h-3 text-sky-500" />
-              </a>
-            </div>
-
-            {congestion.congestionReason && (
-              <p className="text-[11px] text-slate-500 leading-tight">
-                💡 {congestion.congestionReason}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Spot Real-Time Weather & Precipitation Forecast */}
-        <div className="px-5 pt-1 pb-1.5">
-          <SpotWeatherWidget spotId={spot.id} currentLanguage={currentLanguage} />
-        </div>
-
-        {/* Day & Night Highlights Comparison Box */}
-        <div className="px-5 py-2.5 space-y-2">
-          {/* Day Highlight */}
-          <div
-            className={`p-2.5 rounded-xl border transition-colors ${
-              currentTheme === 'day'
-                ? 'bg-sky-50/80 border-sky-200 text-slate-800 shadow-xs ring-1 ring-sky-300/40'
-                : 'bg-slate-50 border-slate-100 text-slate-700'
-            }`}
-          >
-            <div className="flex items-center gap-1.5 text-xs font-bold text-sky-800 mb-0.5">
-              <Sun className="w-3.5 h-3.5 text-amber-500" />
-              <span>{t.dayHighlightLabel}</span>
-            </div>
-            <p className="text-xs text-slate-600 leading-snug pl-5">{localizedSpot.daytimeHighlight}</p>
-          </div>
-
-          {/* Night Highlight */}
-          <div
-            className={`p-2.5 rounded-xl border transition-colors ${
-              currentTheme === 'night' || currentTheme === 'sunset'
-                ? 'bg-indigo-950/5 border-indigo-200 text-slate-800 shadow-xs ring-1 ring-indigo-300/40'
-                : 'bg-slate-50 border-slate-100 text-slate-700'
-            }`}
-          >
-            <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-800 mb-0.5">
-              <Moon className="w-3.5 h-3.5 text-indigo-600" />
-              <span>{t.nightHighlightLabel}</span>
-            </div>
-            <p className="text-xs text-slate-600 leading-snug pl-5">{localizedSpot.nighttimeHighlight}</p>
-          </div>
-        </div>
-
-        {/* Practical Info (Hours, Tags) */}
-        <div className="px-5 py-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-          <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-slate-400" />
-            {localizedSpot.hours}
-          </span>
-          {localizedSpot.nightHours && (
-            <span className="text-indigo-700 font-medium flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-indigo-500" />
-              {t.nightHoursLabel} {localizedSpot.nightHours}
-            </span>
           )}
-        </div>
 
-        {/* Tags */}
-        <div className="px-5 pt-1 pb-3 flex flex-wrap gap-1">
-          {localizedSpot.tags.map((tag: string, idx: number) => (
-            <span
-              key={idx}
-              className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium"
-            >
-              #{tag}
-            </span>
-          ))}
+          {/* Toggle Details Button */}
+          <button
+            id={`btn-toggle-details-${spot.id}`}
+            type="button"
+            onClick={() => setIsDetailsExpanded((prev) => !prev)}
+            className="w-full py-1.5 px-2 rounded-lg text-xs font-bold text-sky-700 hover:text-sky-900 hover:bg-sky-50/70 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+          >
+            <span>{isDetailsExpanded ? t.hideSpotDetails : t.showSpotDetails}</span>
+            {isDetailsExpanded ? (
+              <ChevronUp className="w-3.5 h-3.5" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5" />
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Card Action Footer */}
-      <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-3">
-        {/* External Map Link with Route if location exists */}
-        <a
-          href={
-            userLocation
-              ? `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${encodeURIComponent(spot.googleMapQuery)}&travelmode=driving`
-              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.googleMapQuery)}`
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-slate-600 hover:text-sky-700 font-medium flex items-center gap-1 py-1"
-          title={userLocation ? t.routeGuidance : t.viewMap}
-        >
-          <Navigation className="w-3 h-3 text-sky-600" />
-          <span>{userLocation ? t.routeGuidance : t.viewMap}</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
+      {/* Clear & Prominent Action Buttons Footer */}
+      <div className="p-3.5 sm:p-4 bg-slate-50/90 border-t border-slate-200/80 space-y-2">
+        {/* Map & Route Buttons (Large, distinct, easy to tap) */}
+        <div className="grid grid-cols-2 gap-2">
+          <a
+            id={`link-google-maps-route-${spot.id}`}
+            href={directionsFromCurrentLocationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition-colors whitespace-nowrap"
+            title={t.routeFromCurrentLocationTitle}
+          >
+            <Navigation className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{t.routeFromCurrentLocation}</span>
+          </a>
 
-        {/* Booking or View Action */}
+          <a
+            id={`link-google-maps-spot-${spot.id}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.googleMapQuery)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-bold transition-colors whitespace-nowrap"
+            title={t.viewMap}
+          >
+            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+            <span className="truncate">{t.viewMap}</span>
+            <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
+          </a>
+        </div>
+
+        {/* Booking Action CTA (Full-width when reservation is needed) */}
         {spot.requiresReservation ? (
           <button
+            id={`btn-book-spot-${spot.id}`}
             type="button"
             onClick={() => onBookSpot(localizedSpot)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold shadow-sm hover:shadow transition-all group-hover:scale-[1.02] cursor-pointer"
+            className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-slate-950 text-xs font-extrabold shadow-sm hover:shadow transition-all cursor-pointer whitespace-nowrap"
           >
-            <CalendarCheck className="w-3.5 h-3.5" />
+            <CalendarCheck className="w-4 h-4 shrink-0" />
             <span>{t.bookTicket}</span>
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="w-3.5 h-3.5 shrink-0" />
           </button>
         ) : (
-          <span className="text-xs text-slate-500 font-medium">{t.noBookingNeeded}</span>
+          <div className="text-[11px] text-slate-500 font-medium text-center pt-0.5">
+            {t.noBookingNeeded}
+          </div>
         )}
       </div>
     </div>

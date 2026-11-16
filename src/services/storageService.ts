@@ -144,6 +144,21 @@ export const storageService = {
     return updatedTarget;
   },
 
+  deleteReservation(id: string): void {
+    const list = this.getAllReservations();
+    const updatedList = list.filter((res) => res.id !== id && res.ticketNumber !== id);
+    const myIds = this.getMyReservationIds();
+    const updatedMyIds = myIds.filter((myId) => myId !== id);
+
+    try {
+      localStorage.setItem(RESERVATIONS_STORAGE_KEY, JSON.stringify(updatedList));
+      localStorage.setItem(MY_RESERVATIONS_KEY, JSON.stringify(updatedMyIds));
+      window.dispatchEvent(new CustomEvent('nichinan_data_update'));
+    } catch {
+      // ignore
+    }
+  },
+
   getFavoriteSpotIds(): string[] {
     try {
       const data = localStorage.getItem(FAVORITES_STORAGE_KEY);

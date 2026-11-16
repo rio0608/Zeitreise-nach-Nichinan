@@ -187,23 +187,23 @@ export const CoursePlanView: React.FC<CoursePlanViewProps> = ({
           <span>ホームへ戻る</span>
         </button>
 
-        <span className="text-[11px] font-bold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200">
+        <span className="text-[11px] font-bold text-amber-900 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-300">
           🗺️ 日南モデルコース自動提案
         </span>
       </div>
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-sky-700 via-teal-700 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-gradient-to-br from-amber-300 via-yellow-200 to-orange-200 border border-amber-300/80 rounded-3xl p-6 sm:p-8 text-slate-900 shadow-lg relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white/35 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-2xl space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-amber-300 text-xs font-bold border border-white/25">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/85 backdrop-blur-md text-amber-900 text-xs font-bold border border-amber-300">
+            <Sparkles className="w-3.5 h-3.5 text-orange-500" />
             <span>現在地＆好みから最短・最適ルートを即時作成</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-slate-950">
             日南 観光モデルコース自動提案
           </h1>
-          <p className="text-xs sm:text-sm text-sky-100 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
             現在地や出発場所、滞在時間、旅のテーマを選ぶだけで、日南の絶景・名物グルメ・歴史スポットをスムーズに巡るあなただけのモデルコースを瞬時に組み立てます。
           </p>
         </div>

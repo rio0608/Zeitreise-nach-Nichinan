@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Reservation } from '../types';
-import { CheckCircle2, Clock, MapPin, Users, Sparkles, AlertCircle, Maximize2, Ticket } from 'lucide-react';
+import { CheckCircle2, Clock, Users, Sparkles, AlertCircle, Maximize2, Ticket, Trash2 } from 'lucide-react';
 
 interface DigitalTicketCardProps {
   reservation: Reservation;
   onOpenFullscreen?: () => void;
   onMarkAsUsed?: () => void;
+  onDelete?: () => void;
   showAdminAction?: boolean;
 }
 
@@ -14,6 +15,7 @@ export const DigitalTicketCard: React.FC<DigitalTicketCardProps> = ({
   reservation,
   onOpenFullscreen,
   onMarkAsUsed,
+  onDelete,
   showAdminAction = false,
 }) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
@@ -217,6 +219,21 @@ export const DigitalTicketCard: React.FC<DigitalTicketCardProps> = ({
             <CheckCircle2 className="w-4 h-4" />
             スタッフ操作：受付完了（QRコード読取済みにする）
           </button>
+        )}
+
+        {/* Delete Ticket Action */}
+        {onDelete && (
+          <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+            <button
+              id={`btn-delete-ticket-${reservation.id}`}
+              type="button"
+              onClick={onDelete}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 font-bold text-xs transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>このチケットを削除</span>
+            </button>
+          </div>
         )}
       </div>
     </div>
