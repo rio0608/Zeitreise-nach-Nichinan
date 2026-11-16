@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { TimeTheme, ScenicSlide } from '../types';
 import { nichinanDaytimeSlides } from '../data/initialData';
 import { Language, SPOT_TRANSLATIONS } from '../i18n/translations';
+import nichinanMascotIcon from '../assets/images/nichinan_yuruchara_icon_1794187068875.jpg';
 import {
   Sun,
   Sunset,
@@ -481,21 +482,31 @@ export const NichinanScenicVisual: React.FC<NichinanScenicVisualProps> = ({
                 <span className="text-xl sm:text-2xl -ml-2 mb-1">🌴</span>
               </div>
 
-              <div className="flex items-end gap-4 sm:gap-8 pb-1 opacity-90">
+              <div className="flex items-end gap-3 sm:gap-6 pb-1 opacity-95">
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl sm:text-3xl drop-shadow-md">🗿</span>
+                  <img
+                    src={nichinanMascotIcon}
+                    alt="にちなんちゃん"
+                    className="w-7 h-7 sm:w-9 sm:h-9 rounded-full border-2 border-white shadow-md object-cover drop-shadow"
+                  />
+                  <span className="text-[9px] sm:text-[11px] font-black text-amber-300 drop-shadow">
+                    にちなんちゃん
+                  </span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-xl sm:text-2xl drop-shadow-md">🗿</span>
                   <span className="text-[10px] sm:text-xs font-bold text-white/90 drop-shadow">
                     サンメッセ
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl sm:text-3xl drop-shadow-md">⛩️</span>
+                  <span className="text-xl sm:text-2xl drop-shadow-md">⛩️</span>
                   <span className="text-[10px] sm:text-xs font-bold text-white/90 drop-shadow">
                     鵜戸神宮
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl sm:text-3xl drop-shadow-md">🏯</span>
+                  <span className="text-xl sm:text-2xl drop-shadow-md">🏯</span>
                   <span className="text-[10px] sm:text-xs font-bold text-white/90 drop-shadow">
                     飫肥城下町
                   </span>

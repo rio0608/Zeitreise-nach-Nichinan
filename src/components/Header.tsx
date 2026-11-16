@@ -2,6 +2,7 @@ import React from 'react';
 import { TimeTheme } from '../types';
 import { Language, UI_TRANSLATIONS } from '../i18n/translations';
 import { Sun, Sunset, Moon, ShieldCheck, Ticket, Palmtree, Sparkles, Compass, Languages, Globe } from 'lucide-react';
+import nichinanMascotIcon from '../assets/images/nichinan_yuruchara_icon_1794187068875.jpg';
 
 interface HeaderProps {
   currentTheme: TimeTheme;
@@ -45,8 +46,12 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onGoHome}
             className="flex items-center gap-2.5 text-left group focus:outline-none cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform text-xl shrink-0">
-              <span>🌴</span>
+            <div className="w-11 h-11 rounded-2xl bg-white p-0.5 border-2 border-white/50 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0 overflow-hidden ring-2 ring-amber-300/60">
+              <img
+                src={nichinanMascotIcon}
+                alt="日南観光 ゆるキャラ にちなんちゃん"
+                className="w-full h-full object-cover rounded-xl"
+              />
             </div>
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">

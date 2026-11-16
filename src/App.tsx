@@ -17,6 +17,7 @@ import { HelpGuideModal } from './components/HelpGuideModal';
 import { CoursePlanView } from './components/CoursePlanView';
 import { Language } from './i18n/translations';
 import { Palmtree, MapPin, HelpCircle } from 'lucide-react';
+import nichinanMascotIcon from './assets/images/nichinan_yuruchara_icon_1794187068875.jpg';
 
 type ActiveView = 'home' | 'booking' | 'tickets' | 'admin' | 'course';
 
@@ -287,7 +288,11 @@ export default function App() {
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🌴</span>
+            <img
+              src={nichinanMascotIcon}
+              alt="日南ゆるキャラ にちなんちゃん"
+              className="w-7 h-7 rounded-lg object-cover border border-amber-300 shadow-2xs"
+            />
             <span className={`font-bold ${activeTheme === 'night' ? 'text-slate-200' : 'text-slate-800'}`}>
               ときめぐり日南
             </span>

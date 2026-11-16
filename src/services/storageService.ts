@@ -5,6 +5,7 @@ const OPERATION_STORAGE_KEY = 'nichinan_trip_operation_v2';
 const RESERVATIONS_STORAGE_KEY = 'nichinan_trip_reservations_v2';
 const MY_RESERVATIONS_KEY = 'nichinan_trip_my_reservations_v2';
 const SPOTS_STORAGE_KEY = 'nichinan_trip_spots_v2';
+const FAVORITES_STORAGE_KEY = 'nichinan_trip_favorites_v1';
 
 export const storageService = {
   getOperationInfo(): OperationInfo {
@@ -141,5 +142,33 @@ export const storageService = {
       }
     }
     return updatedTarget;
+  },
+
+  getFavoriteSpotIds(): string[] {
+    try {
+      const data = localStorage.getItem(FAVORITES_STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return [];
+  },
+
+  toggleFavoriteSpot(spotId: string): string[] {
+    const current = this.getFavoriteSpotIds();
+    const exists = current.includes(spotId);
+    const updated = exists ? current.filter((id) => id !== spotId) : [spotId, ...current];
+    try {
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('nichinan_data_update'));
+    } catch {
+      // ignore
+    }
+    return updated;
   },
 };

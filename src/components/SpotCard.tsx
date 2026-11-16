@@ -16,6 +16,7 @@ import {
   Car,
   Footprints,
   Users,
+  Heart,
 } from 'lucide-react';
 
 interface SpotCardProps {
@@ -26,6 +27,8 @@ interface SpotCardProps {
   userLocation?: { latitude: number; longitude: number } | null;
   onRequestLocation?: () => void;
   currentLanguage?: Language;
+  isFavorite?: boolean;
+  onToggleFavorite?: (spotId: string) => void;
 }
 
 export const SpotCard: React.FC<SpotCardProps> = ({
@@ -36,6 +39,8 @@ export const SpotCard: React.FC<SpotCardProps> = ({
   userLocation,
   onRequestLocation,
   currentLanguage = 'ja',
+  isFavorite = false,
+  onToggleFavorite,
 }) => {
   const t = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.ja;
   const localizedSpot = getLocalizedSpot(spot, currentLanguage);
@@ -137,8 +142,34 @@ export const SpotCard: React.FC<SpotCardProps> = ({
             </span>
           </div>
 
-          {/* Top Right: Live Congestion Badge */}
-          <div className="absolute top-3 right-3">{renderCongestionBadge(true)}</div>
+          {/* Top Right: Live Congestion Badge & Favorite Heart Button */}
+          <div className="absolute top-3 right-3 flex items-center gap-2">
+            {renderCongestionBadge(true)}
+            {onToggleFavorite && (
+              <button
+                id={`btn-favorite-${spot.id}`}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite(spot.id);
+                }}
+                aria-label={isFavorite ? t.removeFromFavorites : t.addToFavorites}
+                aria-pressed={isFavorite}
+                title={isFavorite ? t.removeFromFavorites : t.addToFavorites}
+                className={`p-2 rounded-full backdrop-blur-md border transition-all shadow-sm cursor-pointer active:scale-90 ${
+                  isFavorite
+                    ? 'bg-rose-500/95 border-rose-300 text-white hover:bg-rose-600'
+                    : 'bg-black/45 border-white/30 text-white hover:bg-black/65 hover:border-rose-300/80'
+                }`}
+              >
+                <Heart
+                  className={`w-4 h-4 transition-transform ${
+                    isFavorite ? 'fill-white text-white scale-110' : 'text-white'
+                  }`}
+                />
+              </button>
+            )}
+          </div>
 
           {/* Bottom Overlay: Area & Distance info */}
           <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
@@ -198,18 +229,42 @@ export const SpotCard: React.FC<SpotCardProps> = ({
               </div>
             </div>
 
-            {/* Reservation Badge & Fallback Congestion if no image */}
-            <div className="shrink-0 flex flex-col items-end gap-1">
-              {spot.requiresReservation ? (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold shadow-xs">
-                  <CalendarCheck className="w-3 h-3 text-amber-600" />
-                  {t.requiresBooking}
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-                  {t.freeAdmission}
-                </span>
-              )}
+            {/* Reservation Badge, Fallback Congestion & Fallback Favorite if no image */}
+            <div className="shrink-0 flex flex-col items-end gap-1.5">
+              <div className="flex items-center gap-1.5">
+                {!spot.imageUrl && onToggleFavorite && (
+                  <button
+                    id={`btn-favorite-fallback-${spot.id}`}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleFavorite(spot.id);
+                    }}
+                    aria-label={isFavorite ? t.removeFromFavorites : t.addToFavorites}
+                    aria-pressed={isFavorite}
+                    title={isFavorite ? t.removeFromFavorites : t.addToFavorites}
+                    className={`p-1.5 rounded-full border transition-all cursor-pointer active:scale-90 ${
+                      isFavorite
+                        ? 'bg-rose-50 border-rose-300 text-rose-500 hover:bg-rose-100'
+                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-200'
+                    }`}
+                  >
+                    <Heart
+                      className={`w-4 h-4 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`}
+                    />
+                  </button>
+                )}
+                {spot.requiresReservation ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold shadow-xs">
+                    <CalendarCheck className="w-3 h-3 text-amber-600" />
+                    {t.requiresBooking}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+                    {t.freeAdmission}
+                  </span>
+                )}
+              </div>
               {!spot.imageUrl && renderCongestionBadge(false)}
             </div>
           </div>

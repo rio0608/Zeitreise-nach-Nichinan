@@ -4,6 +4,7 @@ import { NichinanScenicVisual } from './NichinanScenicVisual';
 import { SpotCard } from './SpotCard';
 import { calculateLiveCongestion, getSpotDistanceInfo, getNichinanTrafficOverview } from '../services/congestionService';
 import { calculateDistanceKm, SPOT_COORDINATES } from '../services/coursePlannerService';
+import { storageService } from '../services/storageService';
 import {
   Sun,
   Sunset,
@@ -27,6 +28,7 @@ import {
   X,
   Car,
   ExternalLink,
+  Heart,
 } from 'lucide-react';
 import { Language, UI_TRANSLATIONS, getLocalizedSpot } from '../i18n/translations';
 
@@ -64,9 +66,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const t = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.ja;
   // Tab filter: 'all' | 'day' | 'sunset' | 'night'
   const [timeFilter, setTimeFilter] = useState<SpotTimeFilter>('all');
+  const [onlyFavorites, setOnlyFavorites] = useState<boolean>(false);
+  const [favoriteSpotIds, setFavoriteSpotIds] = useState<string[]>(() =>
+    storageService.getFavoriteSpotIds()
+  );
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [onlyReservationRequired, setOnlyReservationRequired] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Keep favorites synced across tabs/updates
+  React.useEffect(() => {
+    const syncFavorites = () => {
+      setFavoriteSpotIds(storageService.getFavoriteSpotIds());
+    };
+    window.addEventListener('nichinan_data_update', syncFavorites);
+    window.addEventListener('storage', syncFavorites);
+    return () => {
+      window.removeEventListener('nichinan_data_update', syncFavorites);
+      window.removeEventListener('storage', syncFavorites);
+    };
+  }, []);
+
+  const handleToggleFavorite = useCallback((spotId: string) => {
+    const updated = storageService.toggleFavoriteSpot(spotId);
+    setFavoriteSpotIds(updated);
+  }, []);
 
   // Real-time congestion & location states
   const [congestionFilter, setCongestionFilter] = useState<'all' | CongestionLevel>('all');
@@ -214,6 +238,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
   // Filter spots & sort
   const filteredSpots = useMemo(() => {
     const list = spots.filter((spot) => {
+      // Bookmarked Favorites filter
+      if (onlyFavorites && !favoriteSpotIds.includes(spot.id)) {
+        return false;
+      }
+
       // Time suitability filter
       if (timeFilter !== 'all') {
         if (!spot.timeSuitability.includes(timeFilter)) {
@@ -281,6 +310,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
     return list;
   }, [
     spots,
+    onlyFavorites,
+    favoriteSpotIds,
     timeFilter,
     selectedCategory,
     onlyReservationRequired,
@@ -506,12 +537,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </span>
         </div>
 
-        {/* Primary Filter Tabs: Day / Sunset / Night / All */}
+        {/* Primary Filter Tabs: All / Day / Sunset / Night / Favorites */}
         <div className="bg-slate-200/60 p-1.5 rounded-2xl flex items-center gap-1.5 overflow-x-auto shadow-inner">
           <button
-            onClick={() => setTimeFilter('all')}
-            className={`flex-1 min-w-[80px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
-              timeFilter === 'all'
+            onClick={() => {
+              setOnlyFavorites(false);
+              setTimeFilter('all');
+            }}
+            className={`flex-1 min-w-[80px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
+              !onlyFavorites && timeFilter === 'all'
                 ? 'bg-white text-slate-900 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
             }`}
@@ -520,9 +554,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
 
           <button
-            onClick={() => setTimeFilter('day')}
-            className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
-              timeFilter === 'day'
+            onClick={() => {
+              setOnlyFavorites(false);
+              setTimeFilter('day');
+            }}
+            className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
+              !onlyFavorites && timeFilter === 'day'
                 ? 'bg-amber-400 text-slate-950 shadow-sm'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-white/50'
             }`}
@@ -532,9 +569,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
 
           <button
-            onClick={() => setTimeFilter('sunset')}
-            className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
-              timeFilter === 'sunset'
+            onClick={() => {
+              setOnlyFavorites(false);
+              setTimeFilter('sunset');
+            }}
+            className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
+              !onlyFavorites && timeFilter === 'sunset'
                 ? 'bg-orange-500 text-white shadow-sm'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-white/50'
             }`}
@@ -544,15 +584,47 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
 
           <button
-            onClick={() => setTimeFilter('night')}
-            className={`flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
-              timeFilter === 'night'
+            onClick={() => {
+              setOnlyFavorites(false);
+              setTimeFilter('night');
+            }}
+            className={`flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
+              !onlyFavorites && timeFilter === 'night'
                 ? 'bg-indigo-700 text-white shadow-sm'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-white/50'
             }`}
           >
             <Moon className="w-3.5 h-3.5 text-indigo-300" />
             <span>{t.tabNight}</span>
+          </button>
+
+          <button
+            id="tab-filter-favorites"
+            onClick={() => {
+              setOnlyFavorites(true);
+              setTimeFilter('all');
+            }}
+            className={`flex-1 min-w-[125px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
+              onlyFavorites
+                ? 'bg-rose-600 text-white shadow-sm'
+                : 'text-slate-700 hover:text-rose-700 hover:bg-white/60'
+            }`}
+          >
+            <Heart
+              className={`w-3.5 h-3.5 ${
+                onlyFavorites ? 'fill-white text-white' : 'fill-rose-100 text-rose-500'
+              }`}
+            />
+            <span>{t.tabFavorites}</span>
+            <span
+              className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                onlyFavorites
+                  ? 'bg-white/25 text-white'
+                  : 'bg-rose-100 text-rose-700'
+              }`}
+            >
+              {favoriteSpotIds.length}
+            </span>
           </button>
         </div>
 
@@ -896,6 +968,36 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
 
+        {/* Active Bookmarked Spots Filtered View Banner */}
+        {onlyFavorites && (
+          <div className="bg-gradient-to-r from-rose-50 via-white to-amber-50 border border-rose-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200">
+                <Heart className="w-5 h-5 fill-rose-500 text-rose-500" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-black text-slate-900">
+                    {t.favoritesBannerTitle}
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold">
+                    {favoriteSpotIds.length} {t.itemsCount}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-0.5">{t.favoritesBannerDesc}</p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setOnlyFavorites(false)}
+              className="self-start sm:self-auto px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition-colors cursor-pointer shrink-0"
+            >
+              {t.showAllSpotsBtn}
+            </button>
+          </div>
+        )}
+
         {/* Spot Cards Grid */}
         {filteredSpots.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -909,30 +1011,60 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 userLocation={userLocation}
                 onRequestLocation={handleRequestLocation}
                 currentLanguage={currentLanguage}
+                isFavorite={favoriteSpotIds.includes(spot.id)}
+                onToggleFavorite={handleToggleFavorite}
               />
             ))}
           </div>
         ) : (
-          <div className="py-12 px-4 text-center bg-white rounded-2xl border border-dashed border-slate-300">
-            <p className="text-sm font-semibold text-slate-600">
-              {t.noSpotsFound}
-            </p>
-            <p className="text-xs text-slate-400 mt-1">
-              {t.noSpotsHint}
-            </p>
-            <button
-              onClick={() => {
-                setTimeFilter('all');
-                setSelectedCategory('all');
-                setOnlyReservationRequired(false);
-                setCongestionFilter('all');
-                setSearchQuery('');
-                setSortBy('default');
-              }}
-              className="mt-3 px-3 py-1.5 rounded-lg bg-sky-100 text-sky-700 text-xs font-bold hover:bg-sky-200 cursor-pointer"
-            >
-              {t.resetFilters}
-            </button>
+          <div className="py-12 px-4 text-center bg-white rounded-2xl border border-dashed border-slate-300 space-y-2">
+            {onlyFavorites && favoriteSpotIds.length === 0 ? (
+              <>
+                <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-400 flex items-center justify-center mx-auto mb-2">
+                  <Heart className="w-6 h-6" />
+                </div>
+                <p className="text-sm font-semibold text-slate-700">
+                  {t.noFavoritesFound}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {t.noFavoritesHint}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOnlyFavorites(false);
+                    setTimeFilter('all');
+                  }}
+                  className="mt-3 px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 transition-colors cursor-pointer shadow-xs"
+                >
+                  {t.showAllSpotsBtn}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-slate-600">
+                  {t.noSpotsFound}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {t.noSpotsHint}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOnlyFavorites(false);
+                    setTimeFilter('all');
+                    setSelectedCategory('all');
+                    setOnlyReservationRequired(false);
+                    setCongestionFilter('all');
+                    setSearchQuery('');
+                    setSortBy('default');
+                  }}
+                  className="mt-3 px-3 py-1.5 rounded-lg bg-sky-100 text-sky-700 text-xs font-bold hover:bg-sky-200 cursor-pointer"
+                >
+                  {t.resetFilters}
+                </button>
+              </>
+            )}
           </div>
         )}
       </section>
