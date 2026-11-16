@@ -132,7 +132,7 @@ export default function App() {
           ? 'bg-slate-950 text-slate-100'
           : activeTheme === 'sunset'
           ? 'bg-amber-50/60 text-slate-800'
-          : 'bg-sky-50/50 text-slate-800'
+          : 'bg-amber-50/35 text-slate-800'
       }`}
     >
       {/* Header */}
@@ -240,11 +240,11 @@ export default function App() {
       <button
         id="btn-floating-help"
         onClick={() => setIsHelpModalOpen(true)}
-        className="fixed bottom-5 right-5 z-30 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-700 hover:to-teal-700 text-white font-bold text-xs shadow-xl hover:shadow-2xl border border-white/20 transition-all group hover:scale-105"
+        className="fixed bottom-5 right-5 z-30 flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-amber-300 via-yellow-300 to-orange-300 hover:from-amber-400 hover:via-yellow-400 hover:to-orange-400 text-slate-950 font-extrabold text-xs shadow-xl hover:shadow-2xl border-2 border-white ring-2 ring-amber-300/70 transition-all group hover:scale-105 cursor-pointer"
         title="操作説明・使い方ガイドを開く"
         aria-label="操作説明・使い方ガイドを開く"
       >
-        <HelpCircle className="w-4 h-4 text-amber-300 group-hover:rotate-12 transition-transform" />
+        <HelpCircle className="w-4 h-4 text-orange-700 group-hover:rotate-12 transition-transform" />
         <span className="hidden sm:inline">操作説明・使い方</span>
         <span className="sm:hidden">使い方</span>
       </button>
